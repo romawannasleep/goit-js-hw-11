@@ -8,11 +8,17 @@ import { createGallery } from "./js/render-functions";
 const form = document.querySelector(".form");
 form.addEventListener("submit", (e) => {
     e.preventDefault();
+    if (e.target.elements['search-text'].value === "") {
+        iziToast.error({
+            title: 'Error',
+        });
+        return;
+    }
     clearGallery();
     showLoader();
 
     getImagesByQuery(e.target.elements['search-text'].value).then(data => {
-        hideLoader();
+        
         if (data.hits.length === 0) {
             iziToast.error({
                 title: 'Error',
@@ -22,6 +28,12 @@ form.addEventListener("submit", (e) => {
         createGallery(data.hits);
         }
     })
-    .catch(console.error)
+    .catch(error => {
+        iziToast.error({
+            title:'Error',
+            message: `${error}`
+        })
+    })
+    .finally(hideLoader)
     
 });
